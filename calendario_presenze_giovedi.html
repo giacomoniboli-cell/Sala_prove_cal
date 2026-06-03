@@ -290,6 +290,48 @@
       justify-content: flex-start;
     }
 
+    .collapsible {
+      display: grid;
+      gap: 0;
+    }
+
+    .collapsible-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: -2px -2px 0;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    .collapsible-head h2 {
+      margin: 0;
+      color: #fff2c7;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .collapse-toggle {
+      min-height: 28px;
+      padding: 4px 9px;
+      font-size: 11px;
+    }
+
+    .collapsible-body {
+      display: grid;
+      grid-template-columns: inherit;
+      gap: 10px;
+      align-items: inherit;
+      padding-top: 10px;
+    }
+
+    .collapsible.collapsed .collapsible-body {
+      display: none;
+    }
+
     .notice {
       margin: 0 0 16px;
       padding: 8px 10px;
@@ -719,6 +761,11 @@
         grid-template-columns: 1fr auto;
       }
 
+      .extra-days .collapsible-body,
+      .bands-panel .collapsible-body {
+        grid-template-columns: 1fr auto;
+      }
+
       .extra-list,
       .band-list {
         grid-column: 1 / -1;
@@ -756,6 +803,11 @@
         gap: 10px;
         padding: 12px;
         border-left-width: 4px;
+      }
+
+      .extra-days .collapsible-body,
+      .bands-panel .collapsible-body {
+        grid-template-columns: 1fr;
       }
 
       .actions {
@@ -955,22 +1007,34 @@
       </div>
     </section>
 
-    <section class="extra-days" aria-label="Giorni aggiuntivi">
-      <div class="field">
-        <label for="customDate">Aggiungi giorno</label>
-        <input id="customDate" type="date">
+    <section id="extraDaysPanel" class="extra-days collapsible collapsed" aria-label="Giorni aggiuntivi">
+      <div class="collapsible-head">
+        <h2>Giorni extra</h2>
+        <button id="toggleExtraDays" class="collapse-toggle" type="button" aria-expanded="false">Apri</button>
       </div>
-      <button id="addCustomDate" class="primary" type="button">Aggiungi giorno</button>
-      <div id="extraList" class="extra-list" aria-live="polite"></div>
+      <div class="collapsible-body">
+        <div class="field">
+          <label for="customDate">Aggiungi giorno</label>
+          <input id="customDate" type="date">
+        </div>
+        <button id="addCustomDate" class="primary" type="button">Aggiungi giorno</button>
+        <div id="extraList" class="extra-list" aria-live="polite"></div>
+      </div>
     </section>
 
-    <section class="bands-panel" aria-label="Band">
-      <div class="field">
-        <label for="bandName">Aggiungi band</label>
-        <input id="bandName" type="text" placeholder="Nome band">
+    <section id="bandsPanel" class="bands-panel collapsible collapsed" aria-label="Band">
+      <div class="collapsible-head">
+        <h2>Band</h2>
+        <button id="toggleBands" class="collapse-toggle" type="button" aria-expanded="false">Apri</button>
       </div>
-      <button id="addBand" class="primary" type="button">Aggiungi band</button>
-      <div id="bandList" class="band-list full" aria-live="polite"></div>
+      <div class="collapsible-body">
+        <div class="field">
+          <label for="bandName">Aggiungi band</label>
+          <input id="bandName" type="text" placeholder="Nome band">
+        </div>
+        <button id="addBand" class="primary" type="button">Aggiungi band</button>
+        <div id="bandList" class="band-list full" aria-live="polite"></div>
+      </div>
     </section>
 
     <p class="notice">
@@ -1044,9 +1108,13 @@
       customDate: document.getElementById('customDate'),
       addCustomDate: document.getElementById('addCustomDate'),
       extraList: document.getElementById('extraList'),
+      extraDaysPanel: document.getElementById('extraDaysPanel'),
+      toggleExtraDays: document.getElementById('toggleExtraDays'),
       bandName: document.getElementById('bandName'),
       addBand: document.getElementById('addBand'),
       bandList: document.getElementById('bandList'),
+      bandsPanel: document.getElementById('bandsPanel'),
+      toggleBands: document.getElementById('toggleBands'),
       upcomingList: document.getElementById('upcomingList'),
       chips: document.getElementById('chips'),
       thead: document.getElementById('thead'),
@@ -1104,6 +1172,26 @@
       syncEls.status.className = `sync-status ${kind || ''}`.trim();
       syncEls.status.textContent = status;
       syncEls.detail.textContent = detail;
+    }
+
+    function collapseStorageKey(id) {
+      return `presenze-sala-prove-panel-${id}`;
+    }
+
+    function setPanelCollapsed(panel, button, collapsed) {
+      panel.classList.toggle('collapsed', collapsed);
+      button.textContent = collapsed ? 'Apri' : 'Chiudi';
+      button.setAttribute('aria-expanded', String(!collapsed));
+    }
+
+    function setupCollapsible(panel, button, id) {
+      const saved = localStorage.getItem(collapseStorageKey(id));
+      setPanelCollapsed(panel, button, saved !== 'open');
+      button.addEventListener('click', () => {
+        const collapsed = !panel.classList.contains('collapsed');
+        setPanelCollapsed(panel, button, collapsed);
+        localStorage.setItem(collapseStorageKey(id), collapsed ? 'closed' : 'open');
+      });
     }
 
     function getCloudClient() {
@@ -1917,6 +2005,8 @@
     els.cancelImport.addEventListener('click', () => els.importDialog.close());
     els.confirmImport.addEventListener('click', importData);
 
+    setupCollapsible(els.extraDaysPanel, els.toggleExtraDays, 'extra-days');
+    setupCollapsible(els.bandsPanel, els.toggleBands, 'bands');
     loadYear(new Date().getFullYear());
     loadFromCloud(state.year).then(renderAll);
   </script>

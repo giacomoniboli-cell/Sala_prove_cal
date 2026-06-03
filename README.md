@@ -76,6 +76,7 @@ La chiave `anon public` e pensata per stare in una pagina pubblica. Le regole RL
 
 - La pagina mostra i giovedi futuri dell'anno selezionato, includendo oggi se oggi e giovedi.
 - Si possono aggiungere anche giorni extra tramite calendario.
+- I giorni possono essere nascosti dalla visualizzazione e ripristinati dal pannello `Giorni extra`.
 - Per ogni giorno si puo indicare la band che provera, lasciando vuoto se non ancora definita.
 - L'elenco band include opzioni predefinite e puo essere ampliato dalla pagina.
 - In alto sono mostrate le prossime 5 prove con la band selezionata per ciascuna data.
@@ -88,4 +89,4 @@ La chiave `anon public` e pensata per stare in una pagina pubblica. Le regole RL
 
 ## Supabase
 
-Non servono nuove tabelle per giorni extra, persone nascoste o band: questi dati sono salvati nel campo JSON `data` della tabella `attendance_state`.
+Non servono nuove tabelle per giorni extra, giorni nascosti, persone nascoste o band: questi dati sono salvati nel campo JSON `data` della tabella `attendance_state`.

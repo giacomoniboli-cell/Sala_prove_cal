@@ -534,6 +534,24 @@
       color: #f8df88;
       font-size: 16px;
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .date-title {
+      overflow-wrap: anywhere;
+    }
+
+    .hide-day {
+      flex: 0 0 auto;
+      min-height: 26px;
+      padding: 3px 8px;
+      border-color: #d71920;
+      color: #ffe0df;
+      font-size: 11px;
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
     }
 
     .summary-col {
@@ -1034,6 +1052,10 @@
         </div>
         <button id="addCustomDate" class="primary" type="button">Aggiungi giorno</button>
         <div id="extraList" class="extra-list" aria-live="polite"></div>
+        <div class="full">
+          <label>Giorni nascosti</label>
+          <div id="hiddenDateList" class="extra-list" aria-live="polite"></div>
+        </div>
       </div>
     </section>
 
@@ -1091,6 +1113,7 @@
       people: [],
       hiddenPeople: [],
       extraDates: [],
+      hiddenDates: [],
       bands: [],
       dayBands: {},
       attendance: {},
@@ -1112,6 +1135,7 @@
       customDate: document.getElementById('customDate'),
       addCustomDate: document.getElementById('addCustomDate'),
       extraList: document.getElementById('extraList'),
+      hiddenDateList: document.getElementById('hiddenDateList'),
       extraDaysPanel: document.getElementById('extraDaysPanel'),
       toggleExtraDays: document.getElementById('toggleExtraDays'),
       bandName: document.getElementById('bandName'),
@@ -1289,6 +1313,7 @@
         }
       });
       return Array.from(keys)
+        .filter((key) => !state.hiddenDates.includes(key))
         .sort()
         .map(dateFromKey);
     }
@@ -1364,6 +1389,39 @@
       });
     }
 
+    function renderHiddenDates() {
+      els.hiddenDateList.innerHTML = '';
+      const hidden = state.hiddenDates
+        .filter((key) => dateFromKey(key).getFullYear() === state.year)
+        .sort();
+
+      if (!hidden.length) {
+        const empty = document.createElement('span');
+        empty.className = 'muted';
+        empty.textContent = 'Nessun giorno nascosto';
+        els.hiddenDateList.appendChild(empty);
+        return;
+      }
+
+      hidden.forEach((key) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+
+        const label = document.createElement('span');
+        label.textContent = formatDate(dateFromKey(key));
+
+        const restore = document.createElement('button');
+        restore.type = 'button';
+        restore.className = 'toggle-person';
+        restore.textContent = 'Vedi';
+        restore.title = `Ripristina ${label.textContent}`;
+        restore.addEventListener('click', () => restoreDate(key));
+
+        chip.append(label, restore);
+        els.hiddenDateList.appendChild(chip);
+      });
+    }
+
     function renderBands() {
       els.bandList.innerHTML = '';
       if (!state.bands.length) {
@@ -1435,6 +1493,7 @@
       state.people = [];
       state.hiddenPeople = [];
       state.extraDates = [];
+      state.hiddenDates = [];
       state.bands = normalizeBands([]);
       state.dayBands = {};
       state.attendance = {};
@@ -1446,6 +1505,7 @@
           state.people = Array.isArray(parsed.people) ? parsed.people : [];
           state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
           state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
+          state.hiddenDates = Array.isArray(parsed.hiddenDates) ? parsed.hiddenDates : [];
           state.bands = normalizeBands(parsed.bands);
           state.dayBands = parsed.dayBands && typeof parsed.dayBands === 'object' ? parsed.dayBands : {};
           state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
@@ -1462,6 +1522,7 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        hiddenDates: state.hiddenDates,
         bands: state.bands,
         dayBands: state.dayBands,
         attendance: state.attendance,
@@ -1502,6 +1563,7 @@
       state.people = Array.isArray(shared.people) ? shared.people : [];
       state.hiddenPeople = Array.isArray(shared.hiddenPeople) ? shared.hiddenPeople : [];
       state.extraDates = Array.isArray(shared.extraDates) ? shared.extraDates : [];
+      state.hiddenDates = Array.isArray(shared.hiddenDates) ? shared.hiddenDates : [];
       state.bands = normalizeBands(shared.bands);
       state.dayBands = shared.dayBands && typeof shared.dayBands === 'object' ? shared.dayBands : {};
       state.attendance = shared.attendance && typeof shared.attendance === 'object' ? shared.attendance : {};
@@ -1531,6 +1593,7 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        hiddenDates: state.hiddenDates,
         bands: state.bands,
         dayBands: state.dayBands,
         attendance: state.attendance,
@@ -1671,7 +1734,19 @@
         const dateCell = document.createElement('td');
         dateCell.className = 'date-col';
         dateCell.dataset.label = 'Giorno';
-        dateCell.textContent = formatDate(date);
+
+        const dateTitle = document.createElement('span');
+        dateTitle.className = 'date-title';
+        dateTitle.textContent = formatDate(date);
+
+        const hideDay = document.createElement('button');
+        hideDay.type = 'button';
+        hideDay.className = 'hide-day';
+        hideDay.textContent = 'Nascondi';
+        hideDay.title = `Nascondi ${formatDate(date)}`;
+        hideDay.addEventListener('click', () => hideDate(key));
+
+        dateCell.append(dateTitle, hideDay);
         row.appendChild(dateCell);
 
         const bandCell = document.createElement('td');
@@ -1777,6 +1852,7 @@
       els.customDate.min = dateKey(todayAtMidnight());
       renderPeople();
       renderExtraDays();
+      renderHiddenDates();
       renderBands();
       renderUpcomingRehearsals();
       renderTable();
@@ -1826,6 +1902,24 @@
         return;
       }
       state.extraDates = state.extraDates.filter((item) => item !== key);
+      saveYear();
+      renderAll();
+    }
+
+    function hideDate(key) {
+      if (!confirm(`Nascondere ${formatDate(dateFromKey(key))} dalla visualizzazione?`)) {
+        return;
+      }
+      if (!state.hiddenDates.includes(key)) {
+        state.hiddenDates.push(key);
+        state.hiddenDates.sort();
+      }
+      saveYear();
+      renderAll();
+    }
+
+    function restoreDate(key) {
+      state.hiddenDates = state.hiddenDates.filter((item) => item !== key);
       saveYear();
       renderAll();
     }
@@ -1892,6 +1986,7 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        hiddenDates: state.hiddenDates,
         bands: state.bands,
         dayBands: state.dayBands,
         attendance: state.attendance,
@@ -1933,6 +2028,7 @@
         state.people = parsed.people.map(normalizeName).filter(Boolean);
         state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
         state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
+        state.hiddenDates = Array.isArray(parsed.hiddenDates) ? parsed.hiddenDates : [];
         state.bands = normalizeBands(parsed.bands);
         state.dayBands = parsed.dayBands && typeof parsed.dayBands === 'object' ? parsed.dayBands : {};
         state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
@@ -1954,6 +2050,7 @@
       state.people = [];
       state.hiddenPeople = [];
       state.extraDates = [];
+      state.hiddenDates = [];
       state.bands = normalizeBands([]);
       state.dayBands = {};
       state.attendance = {};

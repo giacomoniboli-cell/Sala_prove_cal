@@ -75,8 +75,14 @@ La chiave `anon public` e pensata per stare in una pagina pubblica. Le regole RL
 ## Funzionamento
 
 - La pagina mostra i giovedi futuri dell'anno selezionato, includendo oggi se oggi e giovedi.
+- Si possono aggiungere anche giorni extra tramite calendario.
+- Le persone possono essere nascoste dalla vista principale senza eliminarle.
 - Ogni modifica viene salvata nel browser.
 - Se Supabase e configurato, ogni modifica viene salvata anche online.
 - Il pulsante `Ricarica online` recupera l'ultima situazione condivisa.
-- La colonna `Disponibili` mostra il riepilogo complessivo di chi ha indicato `Presente` per ogni giovedi.
+- Ogni scheda giorno mostra il riepilogo complessivo di chi ha indicato `Presente`.
 - `Esporta CSV` produce un file apribile con Excel.
+
+## Supabase
+
+Non servono nuove tabelle per giorni extra o persone nascoste: questi dati sono salvati nel campo JSON `data` della tabella `attendance_state`.

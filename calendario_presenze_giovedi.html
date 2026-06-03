@@ -43,7 +43,7 @@
         radial-gradient(circle at 18% 0%, rgba(215, 25, 32, 0.28), transparent 32%),
         var(--bg);
       color: var(--ink);
-      font-size: 16px;
+      font-size: 14px;
     }
 
     header {
@@ -69,14 +69,14 @@
     }
 
     main {
-      max-width: 1220px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 20px 18px 40px;
     }
 
     h1 {
       margin: 0 0 8px;
-      font-size: clamp(24px, 3vw, 34px);
+      font-size: clamp(22px, 2.6vw, 30px);
       line-height: 1.1;
       letter-spacing: 0;
       color: #fff6d6;
@@ -93,8 +93,8 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, auto)) 1fr;
-      gap: 12px;
+      grid-template-columns: 130px 210px auto;
+      gap: 10px;
       align-items: end;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.14)),
@@ -102,8 +102,8 @@
       border: 2px solid var(--line);
       border-left: 6px solid var(--primary);
       border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 16px;
+      padding: 10px;
+      margin-bottom: 12px;
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
     }
 
@@ -114,7 +114,7 @@
 
     label {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -135,7 +135,7 @@
       border-radius: 6px;
       background: #120f14;
       color: var(--ink);
-      padding: 8px 10px;
+      padding: 7px 9px;
       font-family: Arial, Helvetica, sans-serif;
     }
 
@@ -155,12 +155,12 @@
     }
 
     button {
-      min-height: 40px;
+      min-height: 36px;
       border: 2px solid #6a5a62;
       border-radius: 4px;
       background: linear-gradient(180deg, #312935, #18141b);
       color: #fff2c7;
-      padding: 8px 12px;
+      padding: 7px 10px;
       cursor: pointer;
       font-weight: 700;
       letter-spacing: 0.02em;
@@ -193,8 +193,8 @@
       border: 2px solid var(--line);
       border-left: 6px solid var(--accent);
       border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 16px;
+      padding: 10px;
+      margin-bottom: 12px;
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
     }
 
@@ -205,18 +205,18 @@
     .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       min-height: 34px;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       border: 1px solid #6a5a62;
       border-radius: 999px;
       background: #2a222d;
-      padding: 6px 8px 6px 12px;
+      padding: 5px 6px 5px 10px;
       max-width: 100%;
       color: #fff2c7;
     }
@@ -226,21 +226,70 @@
     }
 
     .chip button {
-      min-height: 26px;
-      width: 26px;
-      padding: 0;
+      min-height: 24px;
+      width: auto;
+      min-width: 24px;
+      padding: 0 7px;
       border-radius: 50%;
       line-height: 1;
     }
 
+    .chip button.toggle-person {
+      border-radius: 999px;
+      width: auto;
+      min-width: 58px;
+      font-size: 11px;
+    }
+
+    .chip.hidden-person {
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+
+    .extra-days,
+    .bottom-actions {
+      display: grid;
+      gap: 10px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.12)),
+        var(--panel);
+      border: 2px solid var(--line);
+      border-left: 6px solid var(--primary);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    .extra-days {
+      grid-template-columns: minmax(190px, 260px) auto 1fr;
+      align-items: end;
+    }
+
+    .extra-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .bottom-actions {
+      margin-top: 14px;
+      margin-bottom: 0;
+    }
+
+    .bottom-actions .actions {
+      justify-content: flex-start;
+    }
+
     .notice {
       margin: 0 0 16px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border: 1px solid #755f28;
       border-radius: 6px;
       background: rgba(244, 197, 66, 0.12);
       color: #f5df9a;
-      font-size: 14px;
+      font-size: 13px;
       font-family: Arial, Helvetica, sans-serif;
     }
 
@@ -250,13 +299,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin: 0 0 16px;
-      padding: 10px 12px;
+      margin: 0 0 12px;
+      padding: 8px 10px;
       border: 2px solid var(--line);
       border-radius: 6px;
       background: var(--panel);
       color: #334155;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--muted);
       font-family: Arial, Helvetica, sans-serif;
     }
@@ -283,31 +332,59 @@
     }
 
     .table-wrap {
-      overflow: auto;
-      background: var(--panel);
-      border: 2px solid #5b4b55;
-      border-radius: 6px;
-      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+      overflow: visible;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+      width: 100%;
     }
 
     table {
       width: 100%;
-      min-width: 760px;
-      border-collapse: collapse;
+      min-width: 0;
+      border-collapse: separate;
+      border-spacing: 0;
       font-family: Arial, Helvetica, sans-serif;
+    }
+
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    tbody {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 12px;
+    }
+
+    tbody tr {
+      overflow: hidden;
+      border: 2px solid #5b4b55;
+      border-radius: 6px;
+      background: var(--panel);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
     }
 
     th,
     td {
       border-bottom: 1px solid var(--line);
-      border-right: 1px solid var(--line);
-      padding: 8px;
+      border-right: 0;
+      padding: 7px 9px;
       text-align: left;
       vertical-align: middle;
-    }
-
-    tbody tr:nth-child(odd) td {
-      background-color: rgba(255, 255, 255, 0.025);
     }
 
     tbody tr:hover td {
@@ -338,27 +415,53 @@
     }
 
     .date-col {
-      width: 190px;
-      min-width: 190px;
+      width: 100%;
+      min-width: 0;
       font-weight: 700;
-      background: #211a24;
+      background:
+        repeating-linear-gradient(90deg, rgba(244, 197, 66, 0.14) 0 12px, transparent 12px 24px),
+        #18131a;
       color: #f8df88;
+      font-size: 16px;
+      text-transform: uppercase;
     }
 
     .summary-col {
-      width: 260px;
-      min-width: 220px;
+      width: 100%;
+      min-width: 0;
       background: #211a24;
+      display: grid;
+      gap: 4px;
     }
 
     .note-col {
-      width: 240px;
-      min-width: 220px;
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    td[data-person-cell="true"] {
+      display: grid;
+      grid-template-columns: minmax(92px, 34%) 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    td[data-person-cell="true"]::before,
+    .summary-col::before,
+    .note-col::before {
+      content: attr(data-label);
+      color: #f4c542;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .status {
       width: 100%;
-      min-width: 118px;
+      min-width: 0;
       border-radius: 4px;
       font-weight: 700;
       text-transform: uppercase;
@@ -390,9 +493,9 @@
 
     .note {
       width: 100%;
-      min-height: 34px;
+      min-height: 44px;
       resize: vertical;
-      font-size: 14px;
+      font-size: 13px;
       background: #151117;
       color: var(--ink);
     }
@@ -470,7 +573,7 @@
       }
 
       .toolbar {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr auto;
       }
 
       .actions {
@@ -480,6 +583,14 @@
 
       .participants {
         grid-template-columns: 1fr;
+      }
+
+      .extra-days {
+        grid-template-columns: 1fr auto;
+      }
+
+      .extra-list {
+        grid-column: 1 / -1;
       }
     }
 
@@ -507,7 +618,8 @@
       }
 
       .toolbar,
-      .participants {
+      .participants,
+      .extra-days {
         grid-template-columns: 1fr;
         gap: 10px;
         padding: 12px;
@@ -528,7 +640,8 @@
 
       .actions button,
       .toolbar > button,
-      .participants > button {
+      .participants > button,
+      .extra-days > button {
         width: 100%;
       }
 
@@ -554,68 +667,17 @@
         font-size: 13px;
       }
 
-      .table-wrap {
-        overflow: visible;
-        background: transparent;
-        border: 0;
-        box-shadow: none;
-      }
-
-      table,
-      thead,
-      tbody,
-      tr,
-      th,
-      td {
-        display: block;
-        width: 100%;
-      }
-
-      table {
-        min-width: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-      }
-
-      thead {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip: rect(0 0 0 0);
-      }
-
       tbody tr {
         margin: 0 0 14px;
-        overflow: hidden;
-        border: 2px solid #5b4b55;
-        border-radius: 6px;
-        background: var(--panel);
-        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+      }
+
+      tbody {
+        grid-template-columns: 1fr;
       }
 
       th,
       td {
         border-right: 0;
-      }
-
-      td {
-        display: grid;
-        grid-template-columns: minmax(96px, 34%) 1fr;
-        gap: 10px;
-        align-items: center;
-        min-height: 54px;
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--line);
-      }
-
-      td::before {
-        content: attr(data-label);
-        color: #f4c542;
-        font-size: 12px;
-        font-weight: 900;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
       }
 
       tr:last-child td,
@@ -628,26 +690,6 @@
       .note-col {
         width: 100%;
         min-width: 0;
-      }
-
-      .date-col {
-        grid-template-columns: 1fr;
-        gap: 4px;
-        min-height: auto;
-        padding-top: 13px;
-        padding-bottom: 13px;
-        background:
-          repeating-linear-gradient(90deg, rgba(244, 197, 66, 0.14) 0 12px, transparent 12px 24px),
-          #18131a;
-        font-size: 18px;
-      }
-
-      .date-col::before {
-        content: "Giovedi";
-      }
-
-      .summary-col {
-        align-items: start;
       }
 
       .status,
@@ -679,6 +721,9 @@
 
       .toolbar,
       .participants,
+      .extra-days,
+      .bottom-actions,
+      .sync-bar,
       .notice,
       button {
         display: none !important;
@@ -733,14 +778,6 @@
         </select>
       </div>
       <button id="generate" class="primary" type="button">Aggiorna calendario</button>
-      <button id="print" type="button">Stampa</button>
-      <div class="actions">
-        <button id="reloadCloud" type="button">Ricarica online</button>
-        <button id="exportCsv" type="button">Esporta CSV</button>
-        <button id="exportJson" type="button">Esporta dati</button>
-        <button id="importJson" type="button">Importa dati</button>
-        <button id="reset" type="button">Svuota anno</button>
-      </div>
     </section>
 
     <section class="sync-bar" aria-label="Stato salvataggio">
@@ -759,8 +796,17 @@
       </div>
     </section>
 
+    <section class="extra-days" aria-label="Giorni aggiuntivi">
+      <div class="field">
+        <label for="customDate">Aggiungi giorno</label>
+        <input id="customDate" type="date">
+      </div>
+      <button id="addCustomDate" class="primary" type="button">Aggiungi giorno</button>
+      <div id="extraList" class="extra-list" aria-live="polite"></div>
+    </section>
+
     <p class="notice">
-      Sono mostrati solo i giovedi futuri, incluso il giorno stesso se oggi e giovedi. La colonna "Disponibili" riassume chi ha indicato la presenza per ciascuna data.
+      Sono mostrati i giovedi futuri e gli eventuali giorni aggiunti a mano. Ogni scheda riassume chi ha indicato la presenza per quel giorno.
     </p>
 
     <section class="table-wrap" aria-label="Calendario giovedi">
@@ -768,6 +814,17 @@
         <thead id="thead"></thead>
         <tbody id="tbody"></tbody>
       </table>
+    </section>
+
+    <section class="bottom-actions" aria-label="Azioni calendario">
+      <div class="actions">
+        <button id="reloadCloud" type="button">Ricarica online</button>
+        <button id="print" type="button">Stampa</button>
+        <button id="exportCsv" type="button">Esporta CSV</button>
+        <button id="exportJson" type="button">Esporta dati</button>
+        <button id="importJson" type="button">Importa dati</button>
+        <button id="reset" type="button">Svuota anno</button>
+      </div>
     </section>
   </main>
 
@@ -796,6 +853,8 @@
     const state = {
       year: new Date().getFullYear(),
       people: [],
+      hiddenPeople: [],
+      extraDates: [],
       attendance: {},
       notes: {}
     };
@@ -812,6 +871,9 @@
       reset: document.getElementById('reset'),
       personName: document.getElementById('personName'),
       addPerson: document.getElementById('addPerson'),
+      customDate: document.getElementById('customDate'),
+      addCustomDate: document.getElementById('addCustomDate'),
+      extraList: document.getElementById('extraList'),
       chips: document.getElementById('chips'),
       thead: document.getElementById('thead'),
       tbody: document.getElementById('tbody'),
@@ -835,6 +897,8 @@
       'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
       'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
     ];
+
+    const dayNames = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
 
     const statuses = [
       { value: '', label: '-' },
@@ -884,7 +948,7 @@
     }
 
     function formatDate(date) {
-      return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+      return `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     }
 
     function todayAtMidnight() {
@@ -911,8 +975,29 @@
       return getThursdays(year).filter((date) => date >= today);
     }
 
+    function dateFromKey(key) {
+      const [year, month, day] = key.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function getCalendarDates(year) {
+      const today = todayAtMidnight();
+      const keys = new Set(getFutureThursdays(year).map(dateKey));
+      state.extraDates.forEach((key) => {
+        const date = dateFromKey(key);
+        if (date.getFullYear() === year && date >= today) {
+          keys.add(key);
+        }
+      });
+      return Array.from(keys)
+        .sort()
+        .map(dateFromKey);
+    }
+
     function availablePeopleForDate(key) {
-      return state.people.filter((person) => state.attendance[key]?.[person] === 'presente');
+      return state.people.filter((person) => {
+        return !state.hiddenPeople.includes(person) && state.attendance[key]?.[person] === 'presente';
+      });
     }
 
     function renderAvailabilityText(cell, key) {
@@ -939,10 +1024,47 @@
       });
     }
 
+    function renderExtraDays() {
+      els.extraList.innerHTML = '';
+      const futureExtras = state.extraDates
+        .filter((key) => {
+          const date = dateFromKey(key);
+          return date.getFullYear() === state.year && date >= todayAtMidnight();
+        })
+        .sort();
+
+      if (!futureExtras.length) {
+        const empty = document.createElement('span');
+        empty.className = 'muted';
+        empty.textContent = 'Nessun giorno extra';
+        els.extraList.appendChild(empty);
+        return;
+      }
+
+      futureExtras.forEach((key) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+
+        const label = document.createElement('span');
+        label.textContent = formatDate(dateFromKey(key));
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = 'x';
+        remove.title = `Rimuovi ${label.textContent}`;
+        remove.addEventListener('click', () => removeCustomDate(key));
+
+        chip.append(label, remove);
+        els.extraList.appendChild(chip);
+      });
+    }
+
     function loadYear(year) {
       const saved = localStorage.getItem(storageKey(year));
       state.year = year;
       state.people = [];
+      state.hiddenPeople = [];
+      state.extraDates = [];
       state.attendance = {};
       state.notes = {};
 
@@ -950,6 +1072,8 @@
         try {
           const parsed = JSON.parse(saved);
           state.people = Array.isArray(parsed.people) ? parsed.people : [];
+          state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
+          state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
           state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
           state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
         } catch (error) {
@@ -962,6 +1086,8 @@
       localStorage.setItem(storageKey(), JSON.stringify({
         year: state.year,
         people: state.people,
+        hiddenPeople: state.hiddenPeople,
+        extraDates: state.extraDates,
         attendance: state.attendance,
         notes: state.notes
       }, null, 2));
@@ -998,6 +1124,8 @@
       const shared = data.data;
       state.year = Number(shared.year) || year;
       state.people = Array.isArray(shared.people) ? shared.people : [];
+      state.hiddenPeople = Array.isArray(shared.hiddenPeople) ? shared.hiddenPeople : [];
+      state.extraDates = Array.isArray(shared.extraDates) ? shared.extraDates : [];
       state.attendance = shared.attendance && typeof shared.attendance === 'object' ? shared.attendance : {};
       state.notes = shared.notes && typeof shared.notes === 'object' ? shared.notes : {};
       localStorage.setItem(storageKey(state.year), JSON.stringify(shared, null, 2));
@@ -1023,6 +1151,8 @@
       const payload = {
         year: state.year,
         people: state.people,
+        hiddenPeople: state.hiddenPeople,
+        extraDates: state.extraDates,
         attendance: state.attendance,
         notes: state.notes
       };
@@ -1056,9 +1186,19 @@
       state.people.forEach((person) => {
         const chip = document.createElement('div');
         chip.className = 'chip';
+        if (state.hiddenPeople.includes(person)) {
+          chip.classList.add('hidden-person');
+        }
 
         const label = document.createElement('span');
         label.textContent = person;
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'toggle-person';
+        toggle.textContent = state.hiddenPeople.includes(person) ? 'Vedi' : 'Nascondi';
+        toggle.title = state.hiddenPeople.includes(person) ? `Mostra ${person}` : `Nascondi ${person}`;
+        toggle.addEventListener('click', () => togglePersonVisibility(person));
 
         const remove = document.createElement('button');
         remove.type = 'button';
@@ -1066,25 +1206,35 @@
         remove.title = `Rimuovi ${person}`;
         remove.addEventListener('click', () => removePerson(person));
 
-        chip.append(label, remove);
+        chip.append(label, toggle, remove);
         els.chips.appendChild(chip);
 
         const option = document.createElement('option');
         option.value = person;
-        option.textContent = person;
+        option.textContent = state.hiddenPeople.includes(person) ? `${person} (nascosto)` : person;
         els.viewPerson.appendChild(option);
       });
     }
 
     function visiblePeople() {
       return els.viewPerson.value === 'all'
-        ? state.people
+        ? state.people.filter((person) => !state.hiddenPeople.includes(person))
         : state.people.filter((person) => person === els.viewPerson.value);
+    }
+
+    function togglePersonVisibility(person) {
+      if (state.hiddenPeople.includes(person)) {
+        state.hiddenPeople = state.hiddenPeople.filter((item) => item !== person);
+      } else {
+        state.hiddenPeople.push(person);
+      }
+      saveYear();
+      renderAll();
     }
 
     function renderTable() {
       const people = visiblePeople();
-      const thursdays = getFutureThursdays(state.year);
+      const calendarDates = getCalendarDates(state.year);
 
       els.thead.innerHTML = '';
       els.tbody.innerHTML = '';
@@ -1092,7 +1242,7 @@
       const headRow = document.createElement('tr');
       const dateHead = document.createElement('th');
       dateHead.className = 'date-col';
-      dateHead.textContent = 'Giovedi';
+      dateHead.textContent = 'Giorno';
       headRow.appendChild(dateHead);
 
       const summaryHead = document.createElement('th');
@@ -1123,24 +1273,24 @@
         return;
       }
 
-      if (!thursdays.length) {
+      if (!calendarDates.length) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
         cell.className = 'empty';
         cell.colSpan = people.length + 3;
-        cell.textContent = 'Non ci sono giovedi futuri nell anno selezionato.';
+        cell.textContent = 'Non ci sono giorni futuri nell anno selezionato.';
         row.appendChild(cell);
         els.tbody.appendChild(row);
         return;
       }
 
-      thursdays.forEach((date) => {
+      calendarDates.forEach((date) => {
         const key = dateKey(date);
         const row = document.createElement('tr');
 
         const dateCell = document.createElement('td');
         dateCell.className = 'date-col';
-        dateCell.dataset.label = 'Giovedi';
+        dateCell.dataset.label = 'Giorno';
         dateCell.textContent = formatDate(date);
         row.appendChild(dateCell);
 
@@ -1153,6 +1303,7 @@
 
         people.forEach((person) => {
           const cell = document.createElement('td');
+          cell.dataset.personCell = 'true';
           cell.dataset.label = person;
           const select = document.createElement('select');
           const value = state.attendance[key]?.[person] || '';
@@ -1202,7 +1353,9 @@
 
     function renderAll() {
       els.year.value = state.year;
+      els.customDate.min = dateKey(todayAtMidnight());
       renderPeople();
+      renderExtraDays();
       renderTable();
     }
 
@@ -1216,7 +1369,40 @@
         return;
       }
       state.people.push(person);
+      state.hiddenPeople = state.hiddenPeople.filter((item) => item !== person);
       els.personName.value = '';
+      saveYear();
+      renderAll();
+    }
+
+    function addCustomDate() {
+      if (!els.customDate.value) {
+        return;
+      }
+      const date = dateFromKey(els.customDate.value);
+      const key = dateKey(date);
+      if (date.getFullYear() !== state.year) {
+        alert('Il giorno scelto deve appartenere all anno selezionato.');
+        return;
+      }
+      if (date < todayAtMidnight()) {
+        alert('Inserire un giorno futuro o il giorno di oggi.');
+        return;
+      }
+      if (!state.extraDates.includes(key)) {
+        state.extraDates.push(key);
+        state.extraDates.sort();
+      }
+      els.customDate.value = '';
+      saveYear();
+      renderAll();
+    }
+
+    function removeCustomDate(key) {
+      if (!confirm(`Rimuovere ${formatDate(dateFromKey(key))} dai giorni extra?`)) {
+        return;
+      }
+      state.extraDates = state.extraDates.filter((item) => item !== key);
       saveYear();
       renderAll();
     }
@@ -1226,6 +1412,7 @@
         return;
       }
       state.people = state.people.filter((item) => item !== person);
+      state.hiddenPeople = state.hiddenPeople.filter((item) => item !== person);
       Object.values(state.attendance).forEach((day) => {
         delete day[person];
       });
@@ -1250,6 +1437,8 @@
       const content = JSON.stringify({
         year: state.year,
         people: state.people,
+        hiddenPeople: state.hiddenPeople,
+        extraDates: state.extraDates,
         attendance: state.attendance,
         notes: state.notes,
         exportedAt: new Date().toISOString()
@@ -1263,11 +1452,12 @@
 
     function exportCsv() {
       const rows = [];
-      rows.push(['Data', ...state.people, 'Note']);
-      getThursdays(state.year).forEach((date) => {
+      rows.push(['Giorno', 'Disponibili', ...state.people, 'Note']);
+      getCalendarDates(state.year).forEach((date) => {
         const key = dateKey(date);
         rows.push([
           formatDate(date),
+          availablePeopleForDate(key).join(', '),
           ...state.people.map((person) => state.attendance[key]?.[person] || ''),
           state.notes[key] || ''
         ]);
@@ -1285,6 +1475,8 @@
         const year = Number(parsed.year) || state.year;
         state.year = year;
         state.people = parsed.people.map(normalizeName).filter(Boolean);
+        state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
+        state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
         state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
         state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
         saveYear();
@@ -1302,6 +1494,8 @@
       }
       localStorage.removeItem(storageKey());
       state.people = [];
+      state.hiddenPeople = [];
+      state.extraDates = [];
       state.attendance = {};
       state.notes = {};
       saveYear();
@@ -1333,9 +1527,15 @@
     els.importJson.addEventListener('click', () => els.importDialog.showModal());
     els.reset.addEventListener('click', resetYear);
     els.addPerson.addEventListener('click', addPerson);
+    els.addCustomDate.addEventListener('click', addCustomDate);
     els.personName.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         addPerson();
+      }
+    });
+    els.customDate.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        addCustomDate();
       }
     });
     els.viewPerson.addEventListener('change', renderTable);

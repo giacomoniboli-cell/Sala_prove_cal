@@ -198,6 +198,10 @@
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
     }
 
+    .table-wrap + .participants {
+      margin-top: 16px;
+    }
+
     .participants .full,
     .bands-panel .full {
       grid-column: 1 / -1;
@@ -996,6 +1000,17 @@
       <div id="upcomingList" class="upcoming-list" aria-live="polite"></div>
     </section>
 
+    <p class="notice">
+      Sono mostrati i giovedi futuri e gli eventuali giorni aggiunti a mano. Ogni scheda indica band, disponibilita e note per quel giorno.
+    </p>
+
+    <section class="table-wrap" aria-label="Calendario giovedi">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
     <section class="participants" aria-label="Persone">
       <div class="field">
         <label for="personName">Aggiungi persona</label>
@@ -1035,17 +1050,6 @@
         <button id="addBand" class="primary" type="button">Aggiungi band</button>
         <div id="bandList" class="band-list full" aria-live="polite"></div>
       </div>
-    </section>
-
-    <p class="notice">
-      Sono mostrati i giovedi futuri e gli eventuali giorni aggiunti a mano. Ogni scheda indica band, disponibilita e note per quel giorno.
-    </p>
-
-    <section class="table-wrap" aria-label="Calendario giovedi">
-      <table>
-        <thead id="thead"></thead>
-        <tbody id="tbody"></tbody>
-      </table>
     </section>
 
     <section class="bottom-actions" aria-label="Azioni calendario">

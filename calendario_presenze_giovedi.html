@@ -1283,6 +1283,13 @@
       });
     }
 
+    function confirmAction(message, action) {
+      if (!confirm(message)) {
+        return;
+      }
+      action();
+    }
+
     function getCloudClient() {
       if (!isCloudConfigured()) {
         return null;
@@ -2104,7 +2111,7 @@
     }
 
     function resetYear() {
-      if (!confirm(`Svuotare persone, presenze e note per il ${state.year}?`)) {
+      if (!confirm(`Svuotare tutto il calendario ${state.year}? Verranno rimossi persone, presenze, band, note e giorni personalizzati per questo anno.`)) {
         return;
       }
       localStorage.removeItem(storageKey());
@@ -2136,13 +2143,25 @@
       });
     });
 
-    els.print.addEventListener('click', () => window.print());
-    els.exportJson.addEventListener('click', exportJson);
-    els.exportCsv.addEventListener('click', exportCsv);
-    els.reloadCloud.addEventListener('click', () => {
-      loadFromCloud(state.year).then(renderAll);
+    els.print.addEventListener('click', () => {
+      confirmAction('Procedere con la stampa del calendario?', () => window.print());
     });
-    els.importJson.addEventListener('click', () => els.importDialog.showModal());
+    els.exportJson.addEventListener('click', () => {
+      confirmAction('Esportare i dati del calendario in formato JSON?', exportJson);
+    });
+    els.exportCsv.addEventListener('click', () => {
+      confirmAction('Esportare il calendario in formato CSV?', exportCsv);
+    });
+    els.reloadCloud.addEventListener('click', () => {
+      confirmAction('Ricaricare i dati online? Eventuali modifiche locali non salvate potrebbero essere sovrascritte.', () => {
+        loadFromCloud(state.year).then(renderAll);
+      });
+    });
+    els.importJson.addEventListener('click', () => {
+      confirmAction('Importare dati da JSON? Potrai incollare il file nella finestra successiva.', () => {
+        els.importDialog.showModal();
+      });
+    });
     els.reset.addEventListener('click', resetYear);
     els.addPerson.addEventListener('click', addPerson);
     els.addCustomDate.addEventListener('click', addCustomDate);

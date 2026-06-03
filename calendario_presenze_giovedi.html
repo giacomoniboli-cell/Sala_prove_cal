@@ -842,7 +842,7 @@
 
       header {
         padding: 18px 14px 20px;
-        grid-template-columns: minmax(0, 1fr) 64px;
+        grid-template-columns: 64px minmax(0, 1fr);
         gap: 10px;
       }
 
@@ -857,9 +857,16 @@
       }
 
       .header-photo {
+        grid-column: 1;
+        grid-row: 1;
         width: 64px;
         border-width: 2px;
         box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+      }
+
+      .hero-copy {
+        grid-column: 2;
+        grid-row: 1;
       }
 
       main {

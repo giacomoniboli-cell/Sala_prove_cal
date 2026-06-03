@@ -70,7 +70,27 @@ const CLOUD_CONFIG = {
 };
 ```
 
-La chiave `anon public` e pensata per stare in una pagina pubblica. Le regole RLS dello script limitano l'accesso alla tabella del calendario, ma chiunque abbia il link potra modificare le presenze.
+La chiave `anon public` e pensata per stare in una pagina pubblica. Le regole RLS dello script limitano l'accesso alla tabella del calendario, ma la configurazione attuale consente a chiunque abbia il link di modificare i dati del calendario.
+
+## Sicurezza modifiche
+
+Configurazione attuale:
+
+- lettura pubblica tramite chiave `anon public`;
+- inserimento e aggiornamento pubblici sulla sola riga `sala-prove-*`;
+- nessun login e nessuna password;
+- chiunque abbia il link puo modificare presenze, band, note e giorni visibili.
+
+Questa impostazione e comoda per un gruppo piccolo e informale, ma non protegge da modifiche indesiderate se il link viene condiviso troppo.
+
+Evoluzione consigliata, se servira proteggere le modifiche senza introdurre utenti e password:
+
+- lasciare pubblica la lettura;
+- bloccare `insert` e `update` diretti al ruolo `anon`;
+- salvare le modifiche tramite una Supabase Edge Function;
+- proteggere la funzione con un codice condiviso salvato nei secret Supabase.
+
+In questo modo il calendario resta facile da consultare, ma solo chi conosce il codice puo modificarlo.
 
 ## Funzionamento
 

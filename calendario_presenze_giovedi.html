@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calendario presenze sala prove</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #110f13;
+      --panel: #1b171d;
+      --panel-strong: #251f28;
+      --ink: #f8f1dc;
+      --muted: #c8bda9;
+      --line: #4a3f4d;
+      --primary: #d71920;
+      --primary-dark: #a80f16;
+      --accent: #f4c542;
+      --present: #153d2b;
+      --present-ink: #a8f0c6;
+      --absent: #4a1618;
+      --absent-ink: #ffc2c5;
+      --maybe: #4d3910;
+      --maybe-ink: #ffe08a;
+      --blank: #2d2830;
+      --focus: #f4c542;
+      --sync-ok: #183d2a;
+      --sync-warn: #46360d;
+      --sync-error: #4a1618;
+      color-scheme: light;
+      font-family: "Arial Black", Impact, Arial, Helvetica, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(215, 25, 32, 0.13) 0 12%, transparent 12% 24%, rgba(244, 197, 66, 0.08) 24% 36%, transparent 36% 100%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 18px),
+        radial-gradient(circle at 18% 0%, rgba(215, 25, 32, 0.28), transparent 32%),
+        var(--bg);
+      color: var(--ink);
+      font-size: 16px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.72)),
+        repeating-linear-gradient(-45deg, rgba(244, 197, 66, 0.2) 0 10px, transparent 10px 20px),
+        #221820;
+      border-bottom: 4px solid var(--primary);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+      padding: 30px 24px 24px;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: auto -6% -22px -6%;
+      height: 42px;
+      background: repeating-linear-gradient(90deg, #f4c542 0 18px, #111 18px 36px);
+      transform: rotate(-1deg);
+      opacity: 0.92;
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 20px 18px 40px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.1;
+      letter-spacing: 0;
+      color: #fff6d6;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0 #d71920, 6px 6px 0 rgba(0, 0, 0, 0.55);
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, auto)) 1fr;
+      gap: 12px;
+      align-items: end;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.14)),
+        var(--panel);
+      border: 2px solid var(--line);
+      border-left: 6px solid var(--primary);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #120f14;
+      color: var(--ink);
+      padding: 8px 10px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus), transparent 60%);
+      outline-offset: 1px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button {
+      min-height: 40px;
+      border: 2px solid #6a5a62;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #312935, #18141b);
+      color: #fff2c7;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+    }
+
+    button.primary {
+      border-color: var(--primary);
+      background: linear-gradient(180deg, #f02b32, var(--primary-dark));
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: linear-gradient(180deg, #ff3d45, #bd1118);
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      transform: translate(-1px, -1px);
+    }
+
+    .participants {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      background:
+        linear-gradient(180deg, rgba(244, 197, 66, 0.08), transparent),
+        var(--panel);
+      border: 2px solid var(--line);
+      border-left: 6px solid var(--accent);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
+    }
+
+    .participants .full {
+      grid-column: 1 / -1;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #6a5a62;
+      border-radius: 999px;
+      background: #2a222d;
+      padding: 6px 8px 6px 12px;
+      max-width: 100%;
+      color: #fff2c7;
+    }
+
+    .chip span {
+      overflow-wrap: anywhere;
+    }
+
+    .chip button {
+      min-height: 26px;
+      width: 26px;
+      padding: 0;
+      border-radius: 50%;
+      line-height: 1;
+    }
+
+    .notice {
+      margin: 0 0 16px;
+      padding: 10px 12px;
+      border: 1px solid #755f28;
+      border-radius: 6px;
+      background: rgba(244, 197, 66, 0.12);
+      color: #f5df9a;
+      font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .sync-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 16px;
+      padding: 10px 12px;
+      border: 2px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: #334155;
+      font-size: 14px;
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--sync-warn);
+      color: #ffe08a;
+      font-weight: 700;
+    }
+
+    .sync-status.ok {
+      background: var(--sync-ok);
+      color: #a8f0c6;
+    }
+
+    .sync-status.error {
+      background: var(--sync-error);
+      color: #ffc2c5;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      background: var(--panel);
+      border: 2px solid #5b4b55;
+      border-radius: 6px;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(odd) td {
+      background-color: rgba(255, 255, 255, 0.025);
+    }
+
+    tbody tr:hover td {
+      background-color: rgba(244, 197, 66, 0.07);
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background:
+        repeating-linear-gradient(90deg, rgba(244, 197, 66, 0.18) 0 12px, transparent 12px 24px),
+        #1a151c;
+      color: #fff2c7;
+      font-size: 13px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .date-col {
+      width: 190px;
+      min-width: 190px;
+      font-weight: 700;
+      background: #211a24;
+      color: #f8df88;
+    }
+
+    .summary-col {
+      width: 260px;
+      min-width: 220px;
+      background: #211a24;
+    }
+
+    .note-col {
+      width: 240px;
+      min-width: 220px;
+    }
+
+    .status {
+      width: 100%;
+      min-width: 118px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .status.presente {
+      background: var(--present);
+      color: var(--present-ink);
+      border-color: #45c879;
+    }
+
+    .status.assente {
+      background: var(--absent);
+      color: var(--absent-ink);
+      border-color: #d71920;
+    }
+
+    .status.forse {
+      background: var(--maybe);
+      color: var(--maybe-ink);
+      border-color: #f4c542;
+    }
+
+    .status.blank {
+      background: var(--blank);
+      color: #c8bda9;
+    }
+
+    .note {
+      width: 100%;
+      min-height: 34px;
+      resize: vertical;
+      font-size: 14px;
+      background: #151117;
+      color: var(--ink);
+    }
+
+    .available-list {
+      color: var(--present-ink);
+      font-weight: 700;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      text-shadow: 0 0 8px rgba(69, 200, 121, 0.24);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .empty {
+      padding: 26px;
+      color: var(--muted);
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    dialog {
+      width: min(680px, calc(100vw - 28px));
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 0;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.38);
+    }
+
+    .dialog-body {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .dialog-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #151117;
+    }
+
+    .dialog-head h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #fff2c7;
+      text-transform: uppercase;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @media (max-width: 860px) {
+      header {
+        padding: 18px 16px 14px;
+      }
+
+      main {
+        padding: 14px 10px 28px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+      }
+
+      .participants {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        font-size: 15px;
+      }
+
+      header {
+        padding: 18px 14px 20px;
+      }
+
+      header::after {
+        height: 28px;
+      }
+
+      h1 {
+        font-size: 25px;
+        line-height: 1.08;
+        text-shadow: 2px 2px 0 #d71920, 4px 4px 0 rgba(0, 0, 0, 0.55);
+      }
+
+      main {
+        padding: 12px 8px 28px;
+      }
+
+      .toolbar,
+      .participants {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 12px;
+        border-left-width: 4px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+      }
+
+      .actions button {
+        padding-left: 8px;
+        padding-right: 8px;
+        overflow-wrap: anywhere;
+      }
+
+      .actions button,
+      .toolbar > button,
+      .participants > button {
+        width: 100%;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        min-height: 46px;
+        font-size: 16px;
+      }
+
+      .sync-bar {
+        align-items: stretch;
+      }
+
+      .sync-status {
+        justify-content: center;
+        width: 100%;
+        border-radius: 6px;
+      }
+
+      .notice {
+        font-size: 13px;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        width: 100%;
+      }
+
+      table {
+        min-width: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      tbody tr {
+        margin: 0 0 14px;
+        overflow: hidden;
+        border: 2px solid #5b4b55;
+        border-radius: 6px;
+        background: var(--panel);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+      }
+
+      th,
+      td {
+        border-right: 0;
+      }
+
+      td {
+        display: grid;
+        grid-template-columns: minmax(96px, 34%) 1fr;
+        gap: 10px;
+        align-items: center;
+        min-height: 54px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      td::before {
+        content: attr(data-label);
+        color: #f4c542;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td,
+      td:last-child {
+        border-bottom: 0;
+      }
+
+      .date-col,
+      .summary-col,
+      .note-col {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .date-col {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        min-height: auto;
+        padding-top: 13px;
+        padding-bottom: 13px;
+        background:
+          repeating-linear-gradient(90deg, rgba(244, 197, 66, 0.14) 0 12px, transparent 12px 24px),
+          #18131a;
+        font-size: 18px;
+      }
+
+      .date-col::before {
+        content: "Giovedi";
+      }
+
+      .summary-col {
+        align-items: start;
+      }
+
+      .status,
+      .note {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .note {
+        min-height: 72px;
+      }
+
+      .empty {
+        display: block;
+        border: 2px solid #5b4b55;
+        border-radius: 6px;
+      }
+
+      .empty::before {
+        content: "";
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+
+      .toolbar,
+      .participants,
+      .notice,
+      button {
+        display: none !important;
+      }
+
+      main {
+        max-width: none;
+        padding: 0;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        border: 0;
+        box-shadow: none;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 11px;
+      }
+
+      thead th,
+      .date-col,
+      .summary-col {
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      th,
+      td {
+        padding: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calendario presenze sala prove</h1>
+    <p>Gestione dei giovedi dell'anno con indicazione di presenza, assenza o disponibilita da confermare.</p>
+  </header>
+
+  <main>
+    <section class="toolbar" aria-label="Strumenti calendario">
+      <div class="field">
+        <label for="year">Anno</label>
+        <input id="year" type="number" min="2020" max="2100" step="1">
+      </div>
+      <div class="field">
+        <label for="viewPerson">Vista persona</label>
+        <select id="viewPerson">
+          <option value="all">Tutti</option>
+        </select>
+      </div>
+      <button id="generate" class="primary" type="button">Aggiorna calendario</button>
+      <button id="print" type="button">Stampa</button>
+      <div class="actions">
+        <button id="reloadCloud" type="button">Ricarica online</button>
+        <button id="exportCsv" type="button">Esporta CSV</button>
+        <button id="exportJson" type="button">Esporta dati</button>
+        <button id="importJson" type="button">Importa dati</button>
+        <button id="reset" type="button">Svuota anno</button>
+      </div>
+    </section>
+
+    <section class="sync-bar" aria-label="Stato salvataggio">
+      <span id="syncStatus" class="sync-status">Salvataggio locale</span>
+      <span id="syncDetail">Configura Supabase nel file HTML per salvare le modifiche online e condividerle tra tutti.</span>
+    </section>
+
+    <section class="participants" aria-label="Persone">
+      <div class="field">
+        <label for="personName">Aggiungi persona</label>
+        <input id="personName" type="text" placeholder="Nome e cognome">
+      </div>
+      <button id="addPerson" class="primary" type="button">Aggiungi</button>
+      <div class="full">
+        <div id="chips" class="chips" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <p class="notice">
+      Sono mostrati solo i giovedi futuri, incluso il giorno stesso se oggi e giovedi. La colonna "Disponibili" riassume chi ha indicato la presenza per ciascuna data.
+    </p>
+
+    <section class="table-wrap" aria-label="Calendario giovedi">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <dialog id="importDialog">
+    <div class="dialog-head">
+      <h2>Importa dati</h2>
+      <button id="closeDialog" type="button" aria-label="Chiudi">x</button>
+    </div>
+    <div class="dialog-body">
+      <p>Incolla qui il contenuto del file esportato in formato JSON.</p>
+      <textarea id="importText" rows="10" spellcheck="false"></textarea>
+      <div class="dialog-actions">
+        <button id="cancelImport" type="button">Annulla</button>
+        <button id="confirmImport" class="primary" type="button">Importa</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const CLOUD_CONFIG = {
+      supabaseUrl: '',
+      supabaseAnonKey: '',
+      tableName: 'attendance_state'
+    };
+
+    const state = {
+      year: new Date().getFullYear(),
+      people: [],
+      attendance: {},
+      notes: {}
+    };
+
+    const els = {
+      year: document.getElementById('year'),
+      viewPerson: document.getElementById('viewPerson'),
+      generate: document.getElementById('generate'),
+      print: document.getElementById('print'),
+      exportCsv: document.getElementById('exportCsv'),
+      exportJson: document.getElementById('exportJson'),
+      importJson: document.getElementById('importJson'),
+      reloadCloud: document.getElementById('reloadCloud'),
+      reset: document.getElementById('reset'),
+      personName: document.getElementById('personName'),
+      addPerson: document.getElementById('addPerson'),
+      chips: document.getElementById('chips'),
+      thead: document.getElementById('thead'),
+      tbody: document.getElementById('tbody'),
+      importDialog: document.getElementById('importDialog'),
+      importText: document.getElementById('importText'),
+      closeDialog: document.getElementById('closeDialog'),
+      cancelImport: document.getElementById('cancelImport'),
+      confirmImport: document.getElementById('confirmImport')
+    };
+
+    const syncEls = {
+      status: document.getElementById('syncStatus'),
+      detail: document.getElementById('syncDetail')
+    };
+
+    let cloudClient = null;
+    let saveTimer = null;
+    let isLoadingCloud = false;
+
+    const monthNames = [
+      'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+      'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
+    ];
+
+    const statuses = [
+      { value: '', label: '-' },
+      { value: 'presente', label: 'Presente' },
+      { value: 'assente', label: 'Assente' },
+      { value: 'forse', label: 'Da confermare' }
+    ];
+
+    function storageKey(year = state.year) {
+      return `presenze-sala-prove-${year}`;
+    }
+
+    function cloudRowId(year = state.year) {
+      return `sala-prove-${year}`;
+    }
+
+    function isCloudConfigured() {
+      return Boolean(CLOUD_CONFIG.supabaseUrl && CLOUD_CONFIG.supabaseAnonKey && window.supabase);
+    }
+
+    function setSyncStatus(kind, status, detail) {
+      syncEls.status.className = `sync-status ${kind || ''}`.trim();
+      syncEls.status.textContent = status;
+      syncEls.detail.textContent = detail;
+    }
+
+    function getCloudClient() {
+      if (!isCloudConfigured()) {
+        return null;
+      }
+      if (!cloudClient) {
+        cloudClient = window.supabase.createClient(CLOUD_CONFIG.supabaseUrl, CLOUD_CONFIG.supabaseAnonKey);
+      }
+      return cloudClient;
+    }
+
+    function normalizeName(name) {
+      return name.trim().replace(/\s+/g, ' ');
+    }
+
+    function dateKey(date) {
+      return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+      ].join('-');
+    }
+
+    function formatDate(date) {
+      return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    function todayAtMidnight() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return today;
+    }
+
+    function getThursdays(year) {
+      const dates = [];
+      const current = new Date(year, 0, 1);
+      while (current.getDay() !== 4) {
+        current.setDate(current.getDate() + 1);
+      }
+      while (current.getFullYear() === year) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 7);
+      }
+      return dates;
+    }
+
+    function getFutureThursdays(year) {
+      const today = todayAtMidnight();
+      return getThursdays(year).filter((date) => date >= today);
+    }
+
+    function availablePeopleForDate(key) {
+      return state.people.filter((person) => state.attendance[key]?.[person] === 'presente');
+    }
+
+    function renderAvailabilityText(cell, key) {
+      const available = availablePeopleForDate(key);
+      cell.innerHTML = '';
+
+      if (!available.length) {
+        const empty = document.createElement('span');
+        empty.className = 'muted';
+        empty.textContent = 'Nessuna disponibilita indicata';
+        cell.appendChild(empty);
+        return;
+      }
+
+      const list = document.createElement('span');
+      list.className = 'available-list';
+      list.textContent = available.join(', ');
+      cell.appendChild(list);
+    }
+
+    function updateSummaryCells(key) {
+      document.querySelectorAll(`[data-summary-date="${key}"]`).forEach((cell) => {
+        renderAvailabilityText(cell, key);
+      });
+    }
+
+    function loadYear(year) {
+      const saved = localStorage.getItem(storageKey(year));
+      state.year = year;
+      state.people = [];
+      state.attendance = {};
+      state.notes = {};
+
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          state.people = Array.isArray(parsed.people) ? parsed.people : [];
+          state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
+          state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
+        } catch (error) {
+          alert('I dati salvati per questo anno non sono leggibili. Il calendario viene aperto vuoto.');
+        }
+      }
+    }
+
+    function saveYear() {
+      localStorage.setItem(storageKey(), JSON.stringify({
+        year: state.year,
+        people: state.people,
+        attendance: state.attendance,
+        notes: state.notes
+      }, null, 2));
+      scheduleCloudSave();
+    }
+
+    async function loadFromCloud(year = state.year) {
+      const client = getCloudClient();
+      if (!client) {
+        setSyncStatus('', 'Salvataggio locale', 'Configura Supabase nel file HTML per sincronizzare le presenze tra tutti.');
+        return false;
+      }
+
+      isLoadingCloud = true;
+      setSyncStatus('', 'Caricamento online', 'Sto recuperando la versione condivisa del calendario.');
+      const { data, error } = await client
+        .from(CLOUD_CONFIG.tableName)
+        .select('data, updated_at')
+        .eq('id', cloudRowId(year))
+        .maybeSingle();
+
+      isLoadingCloud = false;
+
+      if (error) {
+        setSyncStatus('error', 'Errore online', `Non riesco a leggere i dati condivisi: ${error.message}`);
+        return false;
+      }
+
+      if (!data || !data.data) {
+        setSyncStatus('ok', 'Online attivo', 'Nessun dato condiviso ancora presente per questo anno: il prossimo inserimento lo creera.');
+        return false;
+      }
+
+      const shared = data.data;
+      state.year = Number(shared.year) || year;
+      state.people = Array.isArray(shared.people) ? shared.people : [];
+      state.attendance = shared.attendance && typeof shared.attendance === 'object' ? shared.attendance : {};
+      state.notes = shared.notes && typeof shared.notes === 'object' ? shared.notes : {};
+      localStorage.setItem(storageKey(state.year), JSON.stringify(shared, null, 2));
+      setSyncStatus('ok', 'Online aggiornato', `Dati condivisi caricati. Ultimo salvataggio: ${new Date(data.updated_at).toLocaleString('it-IT')}.`);
+      return true;
+    }
+
+    function scheduleCloudSave() {
+      if (isLoadingCloud || !getCloudClient()) {
+        return;
+      }
+      clearTimeout(saveTimer);
+      setSyncStatus('', 'Salvataggio in corso', 'Le modifiche saranno inviate online tra pochi istanti.');
+      saveTimer = setTimeout(saveToCloud, 700);
+    }
+
+    async function saveToCloud() {
+      const client = getCloudClient();
+      if (!client) {
+        return;
+      }
+
+      const payload = {
+        year: state.year,
+        people: state.people,
+        attendance: state.attendance,
+        notes: state.notes
+      };
+
+      const { error } = await client
+        .from(CLOUD_CONFIG.tableName)
+        .upsert({
+          id: cloudRowId(),
+          data: payload,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        setSyncStatus('error', 'Errore salvataggio', `La modifica resta salvata localmente, ma non online: ${error.message}`);
+        return;
+      }
+
+      setSyncStatus('ok', 'Salvato online', `Ultimo salvataggio: ${new Date().toLocaleString('it-IT')}.`);
+    }
+
+    function renderPeople() {
+      els.chips.innerHTML = '';
+      els.viewPerson.innerHTML = '<option value="all">Tutti</option>';
+
+      if (!state.people.length) {
+        const empty = document.createElement('p');
+        empty.textContent = 'Aggiungere almeno una persona per compilare le presenze.';
+        els.chips.appendChild(empty);
+      }
+
+      state.people.forEach((person) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+
+        const label = document.createElement('span');
+        label.textContent = person;
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = 'x';
+        remove.title = `Rimuovi ${person}`;
+        remove.addEventListener('click', () => removePerson(person));
+
+        chip.append(label, remove);
+        els.chips.appendChild(chip);
+
+        const option = document.createElement('option');
+        option.value = person;
+        option.textContent = person;
+        els.viewPerson.appendChild(option);
+      });
+    }
+
+    function visiblePeople() {
+      return els.viewPerson.value === 'all'
+        ? state.people
+        : state.people.filter((person) => person === els.viewPerson.value);
+    }
+
+    function renderTable() {
+      const people = visiblePeople();
+      const thursdays = getFutureThursdays(state.year);
+
+      els.thead.innerHTML = '';
+      els.tbody.innerHTML = '';
+
+      const headRow = document.createElement('tr');
+      const dateHead = document.createElement('th');
+      dateHead.className = 'date-col';
+      dateHead.textContent = 'Giovedi';
+      headRow.appendChild(dateHead);
+
+      const summaryHead = document.createElement('th');
+      summaryHead.className = 'summary-col';
+      summaryHead.textContent = 'Disponibili';
+      headRow.appendChild(summaryHead);
+
+      people.forEach((person) => {
+        const th = document.createElement('th');
+        th.textContent = person;
+        headRow.appendChild(th);
+      });
+
+      const noteHead = document.createElement('th');
+      noteHead.className = 'note-col';
+      noteHead.textContent = 'Note';
+      headRow.appendChild(noteHead);
+      els.thead.appendChild(headRow);
+
+      if (!state.people.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.className = 'empty';
+        cell.colSpan = people.length + 3;
+        cell.textContent = 'Aggiungere le persone, poi compilare le presenze per i prossimi giovedi.';
+        row.appendChild(cell);
+        els.tbody.appendChild(row);
+        return;
+      }
+
+      if (!thursdays.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.className = 'empty';
+        cell.colSpan = people.length + 3;
+        cell.textContent = 'Non ci sono giovedi futuri nell anno selezionato.';
+        row.appendChild(cell);
+        els.tbody.appendChild(row);
+        return;
+      }
+
+      thursdays.forEach((date) => {
+        const key = dateKey(date);
+        const row = document.createElement('tr');
+
+        const dateCell = document.createElement('td');
+        dateCell.className = 'date-col';
+        dateCell.dataset.label = 'Giovedi';
+        dateCell.textContent = formatDate(date);
+        row.appendChild(dateCell);
+
+        const summaryCell = document.createElement('td');
+        summaryCell.className = 'summary-col';
+        summaryCell.dataset.label = 'Disponibili';
+        summaryCell.dataset.summaryDate = key;
+        renderAvailabilityText(summaryCell, key);
+        row.appendChild(summaryCell);
+
+        people.forEach((person) => {
+          const cell = document.createElement('td');
+          cell.dataset.label = person;
+          const select = document.createElement('select');
+          const value = state.attendance[key]?.[person] || '';
+          select.className = `status ${value || 'blank'}`;
+          select.setAttribute('aria-label', `${person}, ${formatDate(date)}`);
+
+          statuses.forEach((status) => {
+            const option = document.createElement('option');
+            option.value = status.value;
+            option.textContent = status.label;
+            option.selected = status.value === value;
+            select.appendChild(option);
+          });
+
+          select.addEventListener('change', () => {
+            if (!state.attendance[key]) {
+              state.attendance[key] = {};
+            }
+            state.attendance[key][person] = select.value;
+            select.className = `status ${select.value || 'blank'}`;
+            saveYear();
+            updateSummaryCells(key);
+          });
+
+          cell.appendChild(select);
+          row.appendChild(cell);
+        });
+
+        const noteCell = document.createElement('td');
+        noteCell.className = 'note-col';
+        noteCell.dataset.label = 'Note';
+        const note = document.createElement('textarea');
+        note.className = 'note';
+        note.rows = 1;
+        note.value = state.notes[key] || '';
+        note.setAttribute('aria-label', `Note ${formatDate(date)}`);
+        note.addEventListener('input', () => {
+          state.notes[key] = note.value;
+          saveYear();
+        });
+        noteCell.appendChild(note);
+        row.appendChild(noteCell);
+
+        els.tbody.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      els.year.value = state.year;
+      renderPeople();
+      renderTable();
+    }
+
+    function addPerson() {
+      const person = normalizeName(els.personName.value);
+      if (!person) {
+        return;
+      }
+      if (state.people.some((existing) => existing.toLowerCase() === person.toLowerCase())) {
+        alert('Questa persona e gia presente nell elenco.');
+        return;
+      }
+      state.people.push(person);
+      els.personName.value = '';
+      saveYear();
+      renderAll();
+    }
+
+    function removePerson(person) {
+      if (!confirm(`Rimuovere ${person} dal calendario?`)) {
+        return;
+      }
+      state.people = state.people.filter((item) => item !== person);
+      Object.values(state.attendance).forEach((day) => {
+        delete day[person];
+      });
+      if (els.viewPerson.value === person) {
+        els.viewPerson.value = 'all';
+      }
+      saveYear();
+      renderAll();
+    }
+
+    function download(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJson() {
+      const content = JSON.stringify({
+        year: state.year,
+        people: state.people,
+        attendance: state.attendance,
+        notes: state.notes,
+        exportedAt: new Date().toISOString()
+      }, null, 2);
+      download(`presenze-sala-prove-${state.year}.json`, content, 'application/json');
+    }
+
+    function csvEscape(value) {
+      return `"${String(value ?? '').replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const rows = [];
+      rows.push(['Data', ...state.people, 'Note']);
+      getThursdays(state.year).forEach((date) => {
+        const key = dateKey(date);
+        rows.push([
+          formatDate(date),
+          ...state.people.map((person) => state.attendance[key]?.[person] || ''),
+          state.notes[key] || ''
+        ]);
+      });
+      const csv = rows.map((row) => row.map(csvEscape).join(';')).join('\n');
+      download(`presenze-sala-prove-${state.year}.csv`, csv, 'text/csv;charset=utf-8');
+    }
+
+    function importData() {
+      try {
+        const parsed = JSON.parse(els.importText.value);
+        if (!parsed || !Array.isArray(parsed.people)) {
+          throw new Error('Formato non valido');
+        }
+        const year = Number(parsed.year) || state.year;
+        state.year = year;
+        state.people = parsed.people.map(normalizeName).filter(Boolean);
+        state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
+        state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
+        saveYear();
+        els.importDialog.close();
+        els.importText.value = '';
+        renderAll();
+      } catch (error) {
+        alert('Importazione non riuscita. Verificare di aver incollato il contenuto JSON esportato.');
+      }
+    }
+
+    function resetYear() {
+      if (!confirm(`Svuotare persone, presenze e note per il ${state.year}?`)) {
+        return;
+      }
+      localStorage.removeItem(storageKey());
+      state.people = [];
+      state.attendance = {};
+      state.notes = {};
+      saveYear();
+      renderAll();
+    }
+
+    els.generate.addEventListener('click', () => {
+      const year = Number(els.year.value);
+      if (!Number.isInteger(year) || year < 2020 || year > 2100) {
+        alert('Inserire un anno valido tra 2020 e 2100.');
+        return;
+      }
+      loadYear(year);
+      loadFromCloud(year).then((loaded) => {
+        if (!loaded) {
+          renderAll();
+        } else {
+          renderAll();
+        }
+      });
+    });
+
+    els.print.addEventListener('click', () => window.print());
+    els.exportJson.addEventListener('click', exportJson);
+    els.exportCsv.addEventListener('click', exportCsv);
+    els.reloadCloud.addEventListener('click', () => {
+      loadFromCloud(state.year).then(renderAll);
+    });
+    els.importJson.addEventListener('click', () => els.importDialog.showModal());
+    els.reset.addEventListener('click', resetYear);
+    els.addPerson.addEventListener('click', addPerson);
+    els.personName.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        addPerson();
+      }
+    });
+    els.viewPerson.addEventListener('change', renderTable);
+    els.closeDialog.addEventListener('click', () => els.importDialog.close());
+    els.cancelImport.addEventListener('click', () => els.importDialog.close());
+    els.confirmImport.addEventListener('click', importData);
+
+    loadYear(new Date().getFullYear());
+    loadFromCloud(state.year).then(renderAll);
+  </script>
+</body>
+</html>

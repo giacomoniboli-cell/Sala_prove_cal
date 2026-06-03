@@ -198,7 +198,8 @@
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
     }
 
-    .participants .full {
+    .participants .full,
+    .bands-panel .full {
       grid-column: 1 / -1;
     }
 
@@ -247,6 +248,7 @@
     }
 
     .extra-days,
+    .bands-panel,
     .bottom-actions {
       display: grid;
       gap: 10px;
@@ -266,7 +268,13 @@
       align-items: end;
     }
 
-    .extra-list {
+    .bands-panel {
+      grid-template-columns: minmax(220px, 1fr) auto;
+      align-items: end;
+    }
+
+    .extra-list,
+    .band-list {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -329,6 +337,62 @@
     .sync-status.error {
       background: var(--sync-error);
       color: #ffc2c5;
+    }
+
+    .next-rehearsals {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .next-rehearsals h2 {
+      margin: 0;
+      color: #fff2c7;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 rgba(215, 25, 32, 0.7);
+    }
+
+    .upcoming-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+    }
+
+    .upcoming-card {
+      min-height: 76px;
+      border: 2px solid #5b4b55;
+      border-left: 5px solid var(--accent);
+      border-radius: 6px;
+      background:
+        linear-gradient(180deg, rgba(244, 197, 66, 0.08), rgba(0, 0, 0, 0.1)),
+        var(--panel);
+      padding: 8px 9px;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+    }
+
+    .upcoming-date {
+      display: block;
+      margin-bottom: 6px;
+      color: #f8df88;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .upcoming-band {
+      display: block;
+      color: #fff2c7;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .upcoming-band.empty {
+      color: var(--muted);
+      font-weight: 400;
     }
 
     .table-wrap {
@@ -441,6 +505,25 @@
       gap: 4px;
     }
 
+    .band-col {
+      display: grid;
+      grid-template-columns: minmax(82px, 30%) 1fr;
+      gap: 6px;
+      align-items: center;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      background: #1e1821;
+    }
+
+    .band-col::before {
+      content: attr(data-label);
+      color: #f4c542;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
     td[data-person-cell="true"] {
       display: grid;
       grid-template-columns: minmax(82px, 30%) 1fr;
@@ -498,6 +581,18 @@
       min-height: 32px;
       padding: 4px 8px;
       font-size: 13px;
+    }
+
+    .band-select {
+      width: 100%;
+      min-height: 32px;
+      min-width: 0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #2d2830;
+      color: #fff2c7;
     }
 
     .status.presente {
@@ -619,11 +714,13 @@
         grid-template-columns: 1fr;
       }
 
-      .extra-days {
+      .extra-days,
+      .bands-panel {
         grid-template-columns: 1fr auto;
       }
 
-      .extra-list {
+      .extra-list,
+      .band-list {
         grid-column: 1 / -1;
       }
     }
@@ -653,7 +750,8 @@
 
       .toolbar,
       .participants,
-      .extra-days {
+      .extra-days,
+      .bands-panel {
         grid-template-columns: 1fr;
         gap: 10px;
         padding: 12px;
@@ -675,7 +773,8 @@
       .actions button,
       .toolbar > button,
       .participants > button,
-      .extra-days > button {
+      .extra-days > button,
+      .bands-panel > button {
         width: 100%;
       }
 
@@ -695,6 +794,10 @@
         justify-content: center;
         width: 100%;
         border-radius: 6px;
+      }
+
+      .upcoming-list {
+        grid-template-columns: 1fr;
       }
 
       .notice {
@@ -737,6 +840,11 @@
         font-size: 15px;
       }
 
+      .band-select {
+        min-height: 42px;
+        font-size: 15px;
+      }
+
       .person-tag {
         min-height: 30px;
         font-size: 12px;
@@ -766,6 +874,8 @@
       .toolbar,
       .participants,
       .extra-days,
+      .bands-panel,
+      .next-rehearsals,
       .bottom-actions,
       .sync-bar,
       .notice,
@@ -829,6 +939,11 @@
       <span id="syncDetail">Configura Supabase nel file HTML per salvare le modifiche online e condividerle tra tutti.</span>
     </section>
 
+    <section class="next-rehearsals" aria-label="Prossime prove">
+      <h2>Prossime prove</h2>
+      <div id="upcomingList" class="upcoming-list" aria-live="polite"></div>
+    </section>
+
     <section class="participants" aria-label="Persone">
       <div class="field">
         <label for="personName">Aggiungi persona</label>
@@ -849,8 +964,17 @@
       <div id="extraList" class="extra-list" aria-live="polite"></div>
     </section>
 
+    <section class="bands-panel" aria-label="Band">
+      <div class="field">
+        <label for="bandName">Aggiungi band</label>
+        <input id="bandName" type="text" placeholder="Nome band">
+      </div>
+      <button id="addBand" class="primary" type="button">Aggiungi band</button>
+      <div id="bandList" class="band-list full" aria-live="polite"></div>
+    </section>
+
     <p class="notice">
-      Sono mostrati i giovedi futuri e gli eventuali giorni aggiunti a mano. Ogni scheda riassume chi ha indicato la presenza per quel giorno.
+      Sono mostrati i giovedi futuri e gli eventuali giorni aggiunti a mano. Ogni scheda indica band, disponibilita e note per quel giorno.
     </p>
 
     <section class="table-wrap" aria-label="Calendario giovedi">
@@ -899,6 +1023,8 @@
       people: [],
       hiddenPeople: [],
       extraDates: [],
+      bands: [],
+      dayBands: {},
       attendance: {},
       notes: {}
     };
@@ -918,6 +1044,10 @@
       customDate: document.getElementById('customDate'),
       addCustomDate: document.getElementById('addCustomDate'),
       extraList: document.getElementById('extraList'),
+      bandName: document.getElementById('bandName'),
+      addBand: document.getElementById('addBand'),
+      bandList: document.getElementById('bandList'),
+      upcomingList: document.getElementById('upcomingList'),
       chips: document.getElementById('chips'),
       thead: document.getElementById('thead'),
       tbody: document.getElementById('tbody'),
@@ -951,6 +1081,13 @@
       { value: 'forse', label: 'Da confermare' }
     ];
 
+    const defaultBands = [
+      'Sushettes & the Maki Band',
+      'Baffi da Rapina',
+      'Poshette Acoustic',
+      'NO PROVE'
+    ];
+
     function storageKey(year = state.year) {
       return `presenze-sala-prove-${year}`;
     }
@@ -981,6 +1118,15 @@
 
     function normalizeName(name) {
       return name.trim().replace(/\s+/g, ' ');
+    }
+
+    function normalizeBands(bands) {
+      const names = [...defaultBands, ...(Array.isArray(bands) ? bands : [])]
+        .map(normalizeName)
+        .filter(Boolean);
+      return names.filter((band, index) => {
+        return names.findIndex((item) => item.toLowerCase() === band.toLowerCase()) === index;
+      });
     }
 
     function personColor(person) {
@@ -1126,12 +1272,79 @@
       });
     }
 
+    function renderBands() {
+      els.bandList.innerHTML = '';
+      if (!state.bands.length) {
+        const empty = document.createElement('span');
+        empty.className = 'muted';
+        empty.textContent = 'Nessuna band in elenco';
+        els.bandList.appendChild(empty);
+        return;
+      }
+
+      state.bands.forEach((band) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+
+        const label = document.createElement('span');
+        label.textContent = band;
+
+        chip.appendChild(label);
+
+        if (!defaultBands.some((item) => item.toLowerCase() === band.toLowerCase())) {
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'x';
+          remove.title = `Rimuovi ${band}`;
+          remove.addEventListener('click', () => removeBand(band));
+          chip.appendChild(remove);
+        }
+
+        els.bandList.appendChild(chip);
+      });
+    }
+
+    function renderUpcomingRehearsals() {
+      els.upcomingList.innerHTML = '';
+      const nextDates = getCalendarDates(state.year).slice(0, 5);
+
+      if (!nextDates.length) {
+        const empty = document.createElement('p');
+        empty.className = 'muted';
+        empty.textContent = 'Nessuna prova futura impostata.';
+        els.upcomingList.appendChild(empty);
+        return;
+      }
+
+      nextDates.forEach((date) => {
+        const key = dateKey(date);
+        const card = document.createElement('article');
+        card.className = 'upcoming-card';
+
+        const dateLabel = document.createElement('span');
+        dateLabel.className = 'upcoming-date';
+        dateLabel.textContent = formatDate(date);
+
+        const bandLabel = document.createElement('span');
+        bandLabel.className = 'upcoming-band';
+        bandLabel.textContent = state.dayBands[key] || 'Band da definire';
+        if (!state.dayBands[key]) {
+          bandLabel.classList.add('empty');
+        }
+
+        card.append(dateLabel, bandLabel);
+        els.upcomingList.appendChild(card);
+      });
+    }
+
     function loadYear(year) {
       const saved = localStorage.getItem(storageKey(year));
       state.year = year;
       state.people = [];
       state.hiddenPeople = [];
       state.extraDates = [];
+      state.bands = normalizeBands([]);
+      state.dayBands = {};
       state.attendance = {};
       state.notes = {};
 
@@ -1141,6 +1354,8 @@
           state.people = Array.isArray(parsed.people) ? parsed.people : [];
           state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
           state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
+          state.bands = normalizeBands(parsed.bands);
+          state.dayBands = parsed.dayBands && typeof parsed.dayBands === 'object' ? parsed.dayBands : {};
           state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
           state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
         } catch (error) {
@@ -1155,6 +1370,8 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        bands: state.bands,
+        dayBands: state.dayBands,
         attendance: state.attendance,
         notes: state.notes
       }, null, 2));
@@ -1193,6 +1410,8 @@
       state.people = Array.isArray(shared.people) ? shared.people : [];
       state.hiddenPeople = Array.isArray(shared.hiddenPeople) ? shared.hiddenPeople : [];
       state.extraDates = Array.isArray(shared.extraDates) ? shared.extraDates : [];
+      state.bands = normalizeBands(shared.bands);
+      state.dayBands = shared.dayBands && typeof shared.dayBands === 'object' ? shared.dayBands : {};
       state.attendance = shared.attendance && typeof shared.attendance === 'object' ? shared.attendance : {};
       state.notes = shared.notes && typeof shared.notes === 'object' ? shared.notes : {};
       localStorage.setItem(storageKey(state.year), JSON.stringify(shared, null, 2));
@@ -1220,6 +1439,8 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        bands: state.bands,
+        dayBands: state.dayBands,
         attendance: state.attendance,
         notes: state.notes
       };
@@ -1361,6 +1582,41 @@
         dateCell.textContent = formatDate(date);
         row.appendChild(dateCell);
 
+        const bandCell = document.createElement('td');
+        bandCell.className = 'band-col';
+        bandCell.dataset.label = 'Band';
+
+        const bandSelect = document.createElement('select');
+        bandSelect.className = 'band-select';
+        bandSelect.setAttribute('aria-label', `Band ${formatDate(date)}`);
+
+        const emptyBand = document.createElement('option');
+        emptyBand.value = '';
+        emptyBand.textContent = '-';
+        emptyBand.selected = !state.dayBands[key];
+        bandSelect.appendChild(emptyBand);
+
+        state.bands.forEach((band) => {
+          const option = document.createElement('option');
+          option.value = band;
+          option.textContent = band;
+          option.selected = state.dayBands[key] === band;
+          bandSelect.appendChild(option);
+        });
+
+        bandSelect.addEventListener('change', () => {
+          if (bandSelect.value) {
+            state.dayBands[key] = bandSelect.value;
+          } else {
+            delete state.dayBands[key];
+          }
+          saveYear();
+          renderUpcomingRehearsals();
+        });
+
+        bandCell.appendChild(bandSelect);
+        row.appendChild(bandCell);
+
         const summaryCell = document.createElement('td');
         summaryCell.className = 'summary-col';
         summaryCell.dataset.label = 'Disponibili';
@@ -1429,6 +1685,8 @@
       els.customDate.min = dateKey(todayAtMidnight());
       renderPeople();
       renderExtraDays();
+      renderBands();
+      renderUpcomingRehearsals();
       renderTable();
     }
 
@@ -1480,6 +1738,36 @@
       renderAll();
     }
 
+    function addBand() {
+      const band = normalizeName(els.bandName.value);
+      if (!band) {
+        return;
+      }
+      if (state.bands.some((existing) => existing.toLowerCase() === band.toLowerCase())) {
+        alert('Questa band e gia presente nell elenco.');
+        return;
+      }
+      state.bands.push(band);
+      state.bands = normalizeBands(state.bands);
+      els.bandName.value = '';
+      saveYear();
+      renderAll();
+    }
+
+    function removeBand(band) {
+      if (!confirm(`Rimuovere ${band} dall elenco band? Le giornate gia assegnate resteranno vuote.`)) {
+        return;
+      }
+      state.bands = state.bands.filter((item) => item !== band);
+      Object.keys(state.dayBands).forEach((key) => {
+        if (state.dayBands[key] === band) {
+          delete state.dayBands[key];
+        }
+      });
+      saveYear();
+      renderAll();
+    }
+
     function removePerson(person) {
       if (!confirm(`Rimuovere ${person} dal calendario?`)) {
         return;
@@ -1512,6 +1800,8 @@
         people: state.people,
         hiddenPeople: state.hiddenPeople,
         extraDates: state.extraDates,
+        bands: state.bands,
+        dayBands: state.dayBands,
         attendance: state.attendance,
         notes: state.notes,
         exportedAt: new Date().toISOString()
@@ -1525,11 +1815,12 @@
 
     function exportCsv() {
       const rows = [];
-      rows.push(['Giorno', 'Disponibili', ...state.people, 'Note']);
+      rows.push(['Giorno', 'Band', 'Disponibili', ...state.people, 'Note']);
       getCalendarDates(state.year).forEach((date) => {
         const key = dateKey(date);
         rows.push([
           formatDate(date),
+          state.dayBands[key] || '',
           availablePeopleForDate(key).join(', '),
           ...state.people.map((person) => state.attendance[key]?.[person] || ''),
           state.notes[key] || ''
@@ -1550,6 +1841,8 @@
         state.people = parsed.people.map(normalizeName).filter(Boolean);
         state.hiddenPeople = Array.isArray(parsed.hiddenPeople) ? parsed.hiddenPeople : [];
         state.extraDates = Array.isArray(parsed.extraDates) ? parsed.extraDates : [];
+        state.bands = normalizeBands(parsed.bands);
+        state.dayBands = parsed.dayBands && typeof parsed.dayBands === 'object' ? parsed.dayBands : {};
         state.attendance = parsed.attendance && typeof parsed.attendance === 'object' ? parsed.attendance : {};
         state.notes = parsed.notes && typeof parsed.notes === 'object' ? parsed.notes : {};
         saveYear();
@@ -1569,6 +1862,8 @@
       state.people = [];
       state.hiddenPeople = [];
       state.extraDates = [];
+      state.bands = normalizeBands([]);
+      state.dayBands = {};
       state.attendance = {};
       state.notes = {};
       saveYear();
@@ -1601,6 +1896,7 @@
     els.reset.addEventListener('click', resetYear);
     els.addPerson.addEventListener('click', addPerson);
     els.addCustomDate.addEventListener('click', addCustomDate);
+    els.addBand.addEventListener('click', addBand);
     els.personName.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         addPerson();
@@ -1609,6 +1905,11 @@
     els.customDate.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         addCustomDate();
+      }
+    });
+    els.bandName.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        addBand();
       }
     });
     els.viewPerson.addEventListener('change', renderTable);

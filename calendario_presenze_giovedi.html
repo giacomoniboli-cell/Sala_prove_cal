@@ -382,7 +382,7 @@
     td {
       border-bottom: 1px solid var(--line);
       border-right: 0;
-      padding: 7px 9px;
+      padding: 6px 9px;
       text-align: left;
       vertical-align: middle;
     }
@@ -443,12 +443,13 @@
 
     td[data-person-cell="true"] {
       display: grid;
-      grid-template-columns: minmax(92px, 34%) 1fr;
-      gap: 8px;
+      grid-template-columns: minmax(82px, 30%) 1fr;
+      gap: 6px;
       align-items: center;
+      padding-top: 5px;
+      padding-bottom: 5px;
     }
 
-    td[data-person-cell="true"]::before,
     .summary-col::before,
     .note-col::before {
       content: attr(data-label);
@@ -459,6 +460,34 @@
       text-transform: uppercase;
     }
 
+    .person-tag,
+    .available-person {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border: 1px solid color-mix(in srgb, var(--person-color), #000 18%);
+      border-radius: 4px;
+      background: var(--person-color);
+      color: #141016;
+      font-weight: 900;
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .person-tag {
+      justify-content: center;
+      padding: 3px 6px;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+
+    .available-person {
+      padding: 2px 6px;
+      font-size: 12px;
+      text-transform: none;
+    }
+
     .status {
       width: 100%;
       min-width: 0;
@@ -466,6 +495,9 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.02em;
+      min-height: 32px;
+      padding: 4px 8px;
+      font-size: 13px;
     }
 
     .status.presente {
@@ -501,11 +533,13 @@
     }
 
     .available-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
       color: var(--present-ink);
       font-weight: 700;
-      line-height: 1.35;
+      line-height: 1.2;
       overflow-wrap: anywhere;
-      text-shadow: 0 0 8px rgba(69, 200, 121, 0.24);
     }
 
     .muted {
@@ -696,6 +730,16 @@
       .note {
         min-width: 0;
         width: 100%;
+      }
+
+      .status {
+        min-height: 42px;
+        font-size: 15px;
+      }
+
+      .person-tag {
+        min-height: 30px;
+        font-size: 12px;
       }
 
       .note {
@@ -939,6 +983,23 @@
       return name.trim().replace(/\s+/g, ' ');
     }
 
+    function personColor(person) {
+      const colors = [
+        '#ffd6e0', '#d8f3dc', '#cde7ff', '#fff1b8', '#e7d7ff',
+        '#c9f4f0', '#ffd9b8', '#e2f0cb', '#f6d6ff', '#d7ecff',
+        '#ffe3ec', '#dff7c8', '#fff4cc', '#d6f0ff', '#eadcff'
+      ];
+      let hash = 0;
+      for (let index = 0; index < person.length; index += 1) {
+        hash = (hash * 31 + person.charCodeAt(index)) >>> 0;
+      }
+      return colors[hash % colors.length];
+    }
+
+    function applyPersonColor(element, person) {
+      element.style.setProperty('--person-color', personColor(person));
+    }
+
     function dateKey(date) {
       return [
         date.getFullYear(),
@@ -1014,7 +1075,13 @@
 
       const list = document.createElement('span');
       list.className = 'available-list';
-      list.textContent = available.join(', ');
+      available.forEach((person) => {
+        const tag = document.createElement('span');
+        tag.className = 'available-person';
+        tag.textContent = person;
+        applyPersonColor(tag, person);
+        list.appendChild(tag);
+      });
       cell.appendChild(list);
     }
 
@@ -1305,6 +1372,12 @@
           const cell = document.createElement('td');
           cell.dataset.personCell = 'true';
           cell.dataset.label = person;
+
+          const personTag = document.createElement('span');
+          personTag.className = 'person-tag';
+          personTag.textContent = person;
+          applyPersonColor(personTag, person);
+
           const select = document.createElement('select');
           const value = state.attendance[key]?.[person] || '';
           select.className = `status ${value || 'blank'}`;
@@ -1328,7 +1401,7 @@
             updateSummaryCells(key);
           });
 
-          cell.appendChild(select);
+          cell.append(personTag, select);
           row.appendChild(cell);
         });
 

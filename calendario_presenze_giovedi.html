@@ -1041,9 +1041,33 @@
         padding: 5px;
       }
     }
+    /* Blocco Password */
+    #lock-overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
+    }
+    .lock-box {
+      background: var(--panel); padding: 30px; border-radius: 6px;
+      border: 2px solid var(--primary); text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .lock-box h2 { margin-top: 0; color: #fff2c7; text-transform: uppercase; }
+    .lock-box input { margin: 15px 0; text-align: center; }
+    #password-error { color: var(--primary); margin-top: 10px; font-size: 13px; display: none; }
   </style>
 </head>
 <body>
+    <div id="lock-overlay">
+    <div class="lock-box">
+      <h2>Accesso Riservato</h2>
+      <p>Inserisci la password per visualizzare e gestire il calendario.</p>
+      <input type="password" id="password-input" placeholder="Password" autofocus>
+      <br>
+      <button id="unlock-btn" class="primary" type="button">Sblocca</button>
+      <div id="password-error">Password errata. Riprova.</div>
+    </div>
+  </div>
   <header>
     <div class="hero-copy">
       <h1>Calendario presenze sala prove</h1>
@@ -1143,6 +1167,7 @@
         <button id="exportJson" type="button">Esporta dati</button>
         <button id="importJson" type="button">Importa dati</button>
         <button id="reset" type="button">Svuota anno</button>
+        <button id="lock-app" type="button" style="border-color: #d71920; color: #ffc2c5;">Blocca Calendario</button>
       </div>
     </section>
   </main>
@@ -1212,7 +1237,12 @@
       importText: document.getElementById('importText'),
       closeDialog: document.getElementById('closeDialog'),
       cancelImport: document.getElementById('cancelImport'),
-      confirmImport: document.getElementById('confirmImport')
+      confirmImport: document.getElementById('confirmImport'),
+      overlay: document.getElementById('lock-overlay'),
+      passInput: document.getElementById('password-input'),
+      unlockBtn: document.getElementById('unlock-btn'),
+      passError: document.getElementById('password-error'),
+      lockApp: document.getElementById('lock-app')
     };
 
     const syncEls = {
@@ -2188,8 +2218,43 @@
 
     setupCollapsible(els.extraDaysPanel, els.toggleExtraDays, 'extra-days');
     setupCollapsible(els.bandsPanel, els.toggleBands, 'bands');
-    loadYear(new Date().getFullYear());
-    loadFromCloud(state.year).then(renderAll);
+    const APP_PASSWORD = "GallElia4ever!"; // Inserisci qui la password desiderata
+
+    function initApp() {
+      loadYear(new Date().getFullYear());
+      loadFromCloud(state.year).then(renderAll);
+    }
+
+    function checkAuth() {
+      if (localStorage.getItem('app_auth') === 'true') {
+        els.overlay.style.display = 'none';
+        initApp();
+      }
+    }
+
+    function handleUnlock() {
+      if (els.passInput.value === APP_PASSWORD) {
+        localStorage.setItem('app_auth', 'true');
+        els.overlay.style.display = 'none';
+        els.passError.style.display = 'none';
+        initApp();
+      } else {
+        els.passError.style.display = 'block';
+        els.passInput.value = '';
+      }
+    }
+
+    els.unlockBtn.addEventListener('click', handleUnlock);
+    els.passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUnlock(); });
+    
+    if (els.lockApp) {
+      els.lockApp.addEventListener('click', () => {
+        localStorage.removeItem('app_auth');
+        location.reload();
+      });
+    }
+
+    checkAuth();
   </script>
 </body>
 </html>
